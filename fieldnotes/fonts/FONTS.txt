@@ -1,0 +1,3 @@
+Barlow Semi Condensed (Jeremy Tribby) and Martian Mono (Evil Martians), latin subsets from
+Google Fonts. Both are licensed under the SIL Open Font License 1.1: https://openfontlicense.org
+Served locally so the app never loads anything from the internet.

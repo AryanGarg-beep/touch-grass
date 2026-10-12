@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Notes</title>
+<style>
+/* Hacktoberfest-style: muted teal page, cream cards with ink borders and hard offset shadows,
+   condensed heavy headings, monospace labels and buttons, coral + yellow accents, pixel tiles.
+   Fonts are bundled in fonts/ (SIL OFL) so nothing loads from the internet. */
+@font-face{font-family:"Barlow Semi Condensed";font-weight:600;font-display:swap;src:url(/fonts/barlow-semi-condensed-600.woff2) format("woff2")}
+@font-face{font-family:"Barlow Semi Condensed";font-weight:800;font-display:swap;src:url(/fonts/barlow-semi-condensed-800.woff2) format("woff2")}
+@font-face{font-family:"Martian Mono";font-weight:100 800;font-display:swap;src:url(/fonts/martian-mono.woff2) format("woff2")}
+:root{
+  --bg:#3d5f58; --bg-deep:#2e4742; --on-bg:#f7f7f2; --on-bg-muted:#d3dcd8;
+  --card:#f7f7f2; --card-2:#e4e5da; --ink:#10201d; --muted:#52635f; --hair:rgba(16,32,29,.18);
+  --coral:#e97b77; --red:#671912; --yellow:#f5b726; --yellow-soft:#fbe4a6; --pink-soft:#f6c4c1; --sage:#8ca59e;
+  --head:"Barlow Semi Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --mono:"Martian Mono",ui-monospace,"JetBrains Mono","DejaVu Sans Mono",Menlo,monospace;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--on-bg);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(rgba(247,247,242,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(247,247,242,.035) 1px,transparent 1px);
+  background-size:14px 14px}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 64px;display:grid;gap:24px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+header{display:grid;gap:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-bottom:2px solid var(--ink)}
+.logo{white-space:nowrap;font:800 26px/1 var(--head);letter-spacing:.01em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.logo .tag{font-size:15px;background:var(--on-bg);color:var(--ink);padding:3px 5px 2px;line-height:1}
+.tools{display:flex;gap:8px}
+.icon-btn{background:none;border:0;color:var(--on-bg);font:500 12.5px var(--mono);padding:6px 8px}
+.icon-btn:hover{text-decoration:underline;text-underline-offset:4px}
+.help-btn{position:relative;width:30px;height:30px;padding:0;border:2px solid var(--on-bg);font:600 14px var(--mono)}
+.help-btn:hover{text-decoration:none;background:var(--on-bg);color:var(--ink)}
+.help-btn.alert::after{content:"";position:absolute;top:-5px;right:-5px;width:9px;height:9px;background:var(--coral);border:2px solid var(--bg)}
+.hero{display:grid;gap:8px;text-align:center;padding:18px 0 4px}
+.eyebrow{font:500 11.5px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--pink-soft)}
+h1{font:800 clamp(38px,7.5vw,64px)/.98 var(--head);margin:0;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--coral)}
+.tagline{color:var(--on-bg-muted);margin:4px 0 0}
+.pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--yellow);padding:6px 10px;font:500 11.5px var(--mono)}
+.pill b{font-weight:600;color:var(--on-bg)}
+.dot{width:8px;height:8px;background:var(--sage)}
+.pill.ok .dot{background:var(--yellow)}
+.pill.warn .dot{background:var(--coral)}
+
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.btn{border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 16px;font:600 13px var(--mono);box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--coral);box-shadow:3px 3px 0 var(--red)}
+.btn.primary:hover:not(:disabled){box-shadow:4px 4px 0 var(--red)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:6px 10px;font-size:11.5px;font-weight:500;box-shadow:2px 2px 0 var(--ink)}
+.btn.danger{color:var(--red)}
+.check{display:inline-flex;align-items:center;gap:6px;color:var(--on-bg-muted);font:500 12px var(--mono)}
+.check input{accent-color:var(--coral)}
+
+.job{padding:11px 14px;font:500 12.5px/1.5 var(--mono);display:flex;justify-content:space-between;gap:12px;align-items:center;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.job .icon-btn{color:inherit}
+.job.busy{background:var(--ink);color:var(--on-bg)}
+.job.done{background:var(--yellow-soft);color:var(--ink)}
+.job.error{background:var(--pink-soft);color:var(--red);border-color:var(--red);box-shadow:4px 4px 0 var(--red)}
+.spinner{display:inline-block;width:10px;height:10px;background:var(--yellow);margin-right:10px;vertical-align:0}
+@media (prefers-reduced-motion:no-preference){.spinner{animation:blink 1s steps(2) infinite}.btn{transition:none}}
+@keyframes blink{50%{background:var(--coral)}}
+
+.card{background:var(--card);color:var(--ink);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:20px 22px;display:grid;gap:14px}
+.card .eyebrow{color:var(--red)}
+.walk-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.walk-date{font:800 24px/1.15 var(--head);margin:0}
+.meta{color:var(--muted);font:500 11.5px/1.5 var(--mono);font-variant-numeric:tabular-nums}
+.entry h3{font:800 30px/1.1 var(--head);margin:0 0 8px;letter-spacing:-.01em}
+.entry p{font:400 16.5px/1.7 var(--sans);margin:0;max-width:64ch}
+.next{border:2px solid var(--ink);background:var(--yellow-soft);padding:9px 12px;font-size:14.5px}
+.next b{color:var(--red);font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font:500 11px var(--mono);background:var(--card-2);border:1.5px solid var(--ink);padding:3px 8px}
+.byline{color:var(--muted);font:500 11px var(--mono)}
+.placeholder{color:var(--muted);font-style:italic;font-size:16px;margin:0}
+
+details.notes summary{cursor:pointer;color:var(--muted);font:500 11.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;list-style:none}
+details.notes summary::-webkit-details-marker{display:none}
+details.notes summary::before{content:"▸ ";color:var(--red)}
+details.notes[open] summary::before{content:"▾ "}
+.note-list{display:grid;gap:2px;margin-top:10px}
+.note{display:grid;grid-template-columns:34px 60px 1fr;gap:10px;align-items:start;padding:7px 0;border-top:1px solid var(--hair)}
+.play{width:30px;height:30px;border:2px solid var(--ink);background:var(--card);color:var(--ink);font-size:11px;line-height:1;box-shadow:2px 2px 0 var(--ink)}
+.play.on{background:var(--coral)}
+.t{font:500 12px/30px var(--mono);color:var(--muted)}
+.tx{padding-top:4px;min-width:0}
+.tx [contenteditable]{padding:1px 3px;margin:-1px -3px}
+.tx [contenteditable]:hover{background:var(--card-2)}
+.tx .pending{color:var(--muted);font-style:italic}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+#walks{display:grid;gap:22px}
+.empty{text-align:center;padding:40px 20px;color:var(--on-bg-muted)}
+.empty h2{font:800 28px var(--head);color:var(--on-bg);margin:0 0 6px}
+
+.week .stats{display:flex;gap:26px;flex-wrap:wrap}
+.stat b{display:block;font:800 40px/1 var(--head)}
+.stat span{color:var(--muted);font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em}
+
+/* the "touch grass" banner: an ink card like the site's map tooltip, with a strip of pixel grass */
+.grass{background:var(--ink);color:var(--on-bg);box-shadow:6px 6px 0 var(--bg-deep);gap:10px;overflow:hidden}
+.grass .verdict{font:800 clamp(34px,6vw,52px)/1 var(--head);margin:0;letter-spacing:-.01em}
+.grass.go .verdict{color:var(--yellow)}
+.grass.later .verdict{color:var(--coral)}
+.grass.stay .verdict{color:var(--pink-soft)}
+.grass .now{font:500 13px/1.5 var(--mono)}
+.grass .eyebrow{color:var(--pink-soft)}
+.grass .meta,.grass .byline{color:var(--sage)}
+.grass .hours{display:flex;gap:8px;flex-wrap:wrap}
+.grass .hours span{font:500 11.5px var(--mono);border:1px solid var(--muted);padding:4px 8px;color:var(--on-bg-muted)}
+.grass .hours b{color:var(--on-bg);font-weight:600;margin-right:4px}
+.pixels{height:10px;margin:6px -22px -20px;background:
+  repeating-linear-gradient(90deg,var(--bg) 0 10px,transparent 10px 12px,var(--sage) 12px 22px,transparent 22px 24px,var(--bg) 24px 34px,transparent 34px 36px,var(--yellow) 36px 46px,transparent 46px 48px,var(--sage) 48px 58px,transparent 58px 60px,var(--bg-deep) 60px 70px,transparent 70px 72px)}
+
+dialog{border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:22px;max-width:440px;width:calc(100% - 32px);box-shadow:8px 8px 0 var(--ink);border-radius:0}
+dialog::backdrop{background:rgba(16,32,29,.55)}
+dialog h2{font:800 28px var(--head);margin:0 0 14px}
+dialog .check{color:var(--muted)}
+.field{display:grid;gap:4px;margin-bottom:14px}
+.field label{font:500 11.5px var(--mono);color:var(--muted)}
+#help{max-width:960px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:0 32px;align-items:start}
+#settings{max-width:760px}
+.cols>section{min-width:0}
+.field select,.field input{width:100%;min-width:0}
+#settings .row{margin-top:20px}
+#help h3,#settings h3{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin:14px 0 6px}
+#help ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px}
+#help code{font-family:var(--mono);font-size:12px;background:var(--card-2);padding:1px 5px}
+#help .row{margin-top:20px}
+#help-setup:not(:empty){background:var(--yellow-soft);border:2px solid var(--ink);padding:10px 12px;display:grid;gap:4px;font-size:13.5px}
+.field .meta{min-height:1.5em}
+.field select,.field input{font:inherit;padding:8px;border:2px solid var(--ink);border-radius:0;background:#fff;color:var(--ink)}
+@media (max-width:560px){.logo{font-size:21px}.tools{gap:2px}.icon-btn{padding:6px 5px}.card{padding:16px}.pixels{margin:6px -16px -16px}.note{grid-template-columns:34px 52px 1fr}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <nav class="topbar">
+      <div class="logo">Field Notes <span class="tag">IRL</span></div>
+      <div class="tools">
+        <button class="icon-btn" id="settings-btn" type="button">Settings</button>
+        <button class="icon-btn help-btn" id="help-btn" type="button" aria-label="Help">?</button>
+        <button class="icon-btn" id="quit-btn" type="button">Quit</button>
+      </div>
+    </nav>
+    <div class="hero">
+      <p class="eyebrow">Pocket recorder · Whisper · Gemma · offline</p>
+      <h1>Go outside. <em>Talk to yourself.</em></h1>
+      <p class="tagline">Voice notes from outside, turned into a journal. Nothing leaves this laptop.</p>
+    </div>
+    <div class="pills" id="pills"></div>
+    <section id="grass" aria-live="polite"></section>
+  </header>
+
+  <section class="actions" aria-label="Actions">
+    <button class="btn primary" id="import-btn" type="button">Import from recorder</button>
+    <label class="check"><input type="checkbox" id="clear-cb" checked> Clear the recorder afterwards</label>
+    <button class="btn" id="upload-btn" type="button">Add phone recordings</button>
+    <input type="file" id="file-in" multiple accept="audio/*,.wav,.m4a,.mp3,.ogg,.opus,.aac,.amr,.webm" hidden>
+    <button class="btn" id="folder-btn" type="button">Import a saved recorder folder</button>
+    <input type="file" id="dir-in" webkitdirectory hidden>
+    <button class="btn" id="week-btn" type="button">Write this week's recap</button>
+  </section>
+
+  <div id="job" aria-live="polite"></div>
+  <section id="week"></section>
+  <section id="walks" aria-label="Outings"></section>
+</main>
+
+<dialog id="settings">
+  <h2>Settings</h2>
+  <div class="cols">
+  <section>
+  <h3>Journal</h3>
+  <div class="field"><label for="set-gemma">Gemma model</label><select id="set-gemma"></select></div>
+  <div class="field"><label for="set-whisper">Whisper model</label>
+    <select id="set-whisper">
+      <option value="tiny.en">tiny.en · fastest, rougher</option>
+      <option value="base.en">base.en · balanced</option>
+      <option value="small.en">small.en · most accurate, slower</option>
+      <option value="base">base · any language</option>
+      <option value="small">small · any language, more accurate</option>
+    </select></div>
+  <label class="check"><input type="checkbox" id="set-auto"> Transcribe and write the entry straight after an import</label>
+  </section>
+  <section>
+  <h3>Weather</h3>
+  <div class="field"><label for="set-loc">Location</label>
+    <input id="set-loc" autocomplete="postal-code" placeholder="PIN code or city">
+    <select id="set-area" hidden></select><span class="meta" id="loc-msg"></span></div>
+  </section>
+  </div>
+  <div class="row"><button class="btn primary" id="set-save" type="button">Save</button><button class="btn" id="set-cancel" type="button">Cancel</button></div>
+</dialog>
+
+<dialog id="help" aria-labelledby="help-title">
+  <h2 id="help-title">How it works</h2>
+  <div id="help-setup"></div>
+  <div class="cols">
+    <section>
+    <h3>Getting notes in</h3>
+    <ul>
+      <li><b>Import from recorder</b>: plug the Pico in by USB. Its notes become one outing, then get transcribed and written up. Tick <i>Clear the recorder afterwards</i> to empty it.</li>
+      <li><b>Import a saved recorder folder</b>: a folder you copied off the recorder. Include its <code>index.csv</code> to keep the timings.</li>
+      <li><b>Add phone recordings</b>: any audio files; together they become one outing.</li>
+    </ul>
+    </section>
+    <section>
+    <h3>Reading an outing</h3>
+    <ul>
+      <li>Times are minutes after setting out. <b>≈</b> means estimated: the recorder restarted, or a note had no line in <code>index.csv</code>.</li>
+      <li>Click a transcript to fix a misheard word, then press <b>Rewrite entry</b>.</li>
+      <li><b>Merge into the outing above</b> joins two outings that were really one walk.</li>
+    </ul>
+    </section>
+    <section>
+    <h3>Weather</h3>
+    <ul>
+      <li>Set a PIN code (then pick your area) or a city in <b>Settings</b>. The banner needs <code>SERPAPI_KEY</code> in <code>fieldnotes/.env</code>.</li>
+      <li>Only your area goes to SerpApi, at most once an hour; a PIN code goes to India Post to find its areas. Gemma decides whether it's worth going out.</li>
+    </ul>
+    </section>
+    <section>
+    <h3>Whisper models</h3>
+    <ul>
+      <li><b>tiny.en</b> is fastest, <b>base.en</b> is a good default, <b>small.en</b> is more accurate but slower. Models without <code>.en</code> understand any language.</li>
+    </ul>
+    </section>
+  </div>
+  <div class="row"><button class="btn primary" id="help-close" type="button">Got it</button></div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let S = null, lastJSON = "", playing = null, confirmDelete = null, confirmMerge = null;
+const audio = new Audio();
+audio.addEventListener("ended", () => { playing = null; render(); });
+
+async function post(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) showLocalError(j.error || "Something went wrong.");
+  return j;
+}
+let localError = "";
+function showLocalError(m) { localError = m; render(); setTimeout(() => { localError = ""; render(); }, 6000); }
+
+function fmtT(s) { s = Math.round(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, {weekday: "long", day: "numeric", month: "long"}) +
+         " · " + d.toLocaleTimeString(undefined, {hour: "numeric", minute: "2-digit"});
+}
+
+function pills() {
+  const r = S.recorder, w = S.whisper, g = S.gemma;
+  const rec = !r.port ? ["warn", "Recorder", "not plugged in"]
+            : !r.access ? ["warn", "Recorder", "no permission"]
+            : ["ok", "Recorder", "connected"];
+  const items = [rec,
+    [w.ok ? "ok" : "warn", "Whisper", w.ok ? w.kind + " · " + w.detail : "not installed"],
+    [g.ok ? "ok" : "warn", "Gemma", g.ok ? g.model : (g.detail.startsWith("Ollama") ? "Ollama not running" : "no model")]];
+  $("#pills").innerHTML = items.map(([c, k, v]) =>
+    `<span class="pill ${c}"><span class="dot"></span><b>${k}</b> ${esc(v)}</span>`).join("");
+  const tips = [];
+  if (r.port && !r.access) tips.push("Recorder: <code>sudo usermod -aG uucp $USER</code>, then log out and back in.");
+  if (!w.ok) tips.push("Transcription: <code>pip install faster-whisper</code> in this app's venv, then restart the app.");
+  if (!g.ok) tips.push(g.detail.startsWith("Ollama") ? "Journal: start Ollama with <code>ollama serve</code>."
+                                                     : "Journal: <code>ollama pull gemma3:4b</code>");
+  $("#help-setup").innerHTML = tips.map(t => `<div>${t}</div>`).join("");
+  $("#help-btn").classList.toggle("alert", tips.length > 0);
+  $("#help-btn").title = tips.length ? "Something needs setting up" : "Help";
+}
+
+function jobBar() {
+  const j = S.job, el = $("#job");
+  if (localError) { el.className = "job error"; el.innerHTML = `<span>${esc(localError)}</span>`; return; }
+  if (j.busy) {
+    el.className = "job busy";
+    el.innerHTML = `<span><span class="spinner"></span>${esc(j.message || j.label)}</span>` +
+      (j.queued ? `<span class="meta">${j.queued} more queued</span>` : "");
+  } else if (j.error) {
+    el.className = "job error";
+    el.innerHTML = `<span>${esc(j.error)}</span><button class="icon-btn" data-act="dismiss">Dismiss</button>`;
+  } else if (j.done) {
+    el.className = "job done";
+    el.innerHTML = `<span>${esc(j.done)}</span><button class="icon-btn" data-act="dismiss">OK</button>`;
+  } else { el.className = ""; el.innerHTML = ""; }
+}
+
+function weekCard() {
+  const w = S.week, el = $("#week");
+  if (!w) { el.innerHTML = ""; return; }
+  const goals = (w.goal_check || []).map(g => `<span class="chip">${esc(g.goal)}: ${esc(g.status)}</span>`).join("");
+  el.innerHTML = `<article class="card week">
+    <div class="eyebrow">This week</div>
+    <div class="stats">
+      <div class="stat"><b>${w.outings}</b><span>outings</span></div>
+      <div class="stat"><b>${w.minutes_outside}</b><span>minutes outside</span></div>
+      <div class="stat"><b>${w.notes}</b><span>voice notes</span></div>
+    </div>
+    <div class="entry"><h3>${esc(w.title)}</h3><p>${esc(w.recap)}</p></div>
+    ${w.highlight ? `<div class="next"><b>Highlight:</b> ${esc(w.highlight)}</div>` : ""}
+    ${goals ? `<div class="chips">${goals}</div>` : ""}
+    ${w.next_week ? `<div class="next"><b>Next week:</b> ${esc(w.next_week)}</div>` : ""}
+    <div class="byline">Written by ${esc(w.model)} on this laptop</div>
+  </article>`;
+}
+
+function grassBanner() {
+  const W = S.weather, el = $("#grass");
+  if (!W || (!W.data && !W.busy && !W.error)) { el.innerHTML = ""; return; }
+  const d = W.data, v = d && d.verdict;
+  const go = d && (d.go || (!v ? "" : v.startsWith("Go later") ? "later" : v.startsWith("Stay") ? "stay" : "now"));
+  const kind = {now: "go", later: "later", stay: "stay"}[go] || "";
+  const hourT = t => esc(String(t).replace(/^[A-Za-z]+day\s+/, ""));
+  const line = h => `${h.temp_c ?? "?"}°C · ${esc(h.weather || "?")} · ${h.precip_pct ?? "?"}% rain`;
+  el.innerHTML = `<article class="card grass ${kind}">
+    <div class="eyebrow">Should you go outside?</div>
+    <p class="verdict">${d ? esc(v || "Weather") : W.busy ? "Checking the weather…" : "No weather yet"}</p>
+    ${d ? `<div class="now">${line(d.now)} <span class="meta">· ${esc(d.location)}</span></div>
+      ${d.reason && v && !v.startsWith("Stay") ? `<div class="meta">${esc(d.reason)}</div>` : ""}
+      ${!v && d.reason ? `<div class="meta">${esc(d.reason)}</div>` : ""}
+      ${d.next_hours.length ? `<div class="hours">${d.next_hours.map(h => `<span><b>${hourT(h.time)}</b> ${h.temp_c ?? "?"}° · ${h.precip_pct ?? "?"}%</span>`).join("")}</div>` : ""}` : ""}
+    ${W.error ? `<div class="meta">Couldn't refresh the weather: ${esc(W.error)}</div>` : ""}
+    <div class="byline">weather via SerpApi · only your area is sent${d && d.model ? " · verdict by " + esc(d.model) : ""}</div>
+    <div class="pixels" aria-hidden="true"></div>
+  </article>`;
+}
+
+function walkCard(w, i) {
+  const st = w.stats, j = w.journal;
+  const pending = w.notes.filter(n => n.transcript === null).length;
+  const hasText = w.notes.some(n => (n.transcript || "").trim());
+  const busy = S.job.busy;
+  const src = w.source === "phone" ? "Phone" : "Recorder";
+  let entry;
+  if (j) {
+    entry = `<div class="entry"><h3>${esc(j.title)}</h3><p>${esc(j.entry)}</p></div>
+      ${j.next_time ? `<div class="next"><b>Next time:</b> ${esc(j.next_time)}</div>` : ""}
+      <div class="chips">${(j.goals || []).map(g => `<span class="chip">Goal: ${esc(g)}</span>`).join("")}
+        ${j.mood ? `<span class="chip">Mood: ${esc(j.mood)}</span>` : ""}</div>
+      <div class="byline">Written by ${esc(j.model)} on this laptop</div>`;
+  } else if (pending) {
+    entry = `<p class="placeholder">${pending} note${pending > 1 ? "s" : ""} waiting to be transcribed.</p>`;
+  } else {
+    entry = `<p class="placeholder">${hasText ? "Ready for its journal entry." : "No speech found in these notes."}</p>`;
+  }
+  const notes = w.notes.map(n => {
+    const key = w.id + "/" + n.file, on = playing === key;
+    const text = n.transcript === null ? `<span class="pending">Not transcribed yet</span>`
+      : `<span contenteditable="plaintext-only" spellcheck="false" data-walk="${w.id}" data-file="${n.file}">${esc(n.transcript || "(nothing heard)")}</span>`;
+    return `<div class="note">
+      <button class="play ${on ? "on" : ""}" data-act="play" data-key="${key}" aria-label="${on ? "Stop" : "Play"} note">${on ? "■" : "▶"}</button>
+      <span class="t" ${n.estimated ? 'title="Estimated time"' : ""}>${n.estimated ? "≈" : ""}${fmtT(n.start_s)}</span>
+      <div class="tx">${text}</div></div>`;
+  }).join("");
+  const del = confirmDelete === w.id
+    ? `<button class="btn small danger" data-act="delete" data-walk="${w.id}">Delete for good</button>
+       <button class="btn small" data-act="cancel-delete">Keep it</button>`
+    : `<button class="btn small danger" data-act="ask-delete" data-walk="${w.id}">Delete</button>`;
+  const above = i > 0 ? S.walks[i - 1].id : null;
+  const merge = !above ? "" : confirmMerge === w.id
+    ? `<button class="btn small" data-act="merge" data-walk="${w.id}" data-into="${above}" ${busy ? "disabled" : ""}>Merge these notes into the outing above</button>
+       <button class="btn small" data-act="cancel-merge">Cancel</button>`
+    : `<button class="btn small" data-act="ask-merge" data-walk="${w.id}" ${busy ? "disabled" : ""}>Merge into the outing above</button>`;
+  const restarts = w.restarts > 0
+    ? `<div class="next"><b>Note:</b> The recorder restarted ${w.restarts} time${w.restarts === 1 ? "" : "s"}; later times are estimates.</div>` : "";
+  return `<article class="card">
+    <div class="walk-head">
+      <h2 class="walk-date">${esc(fmtDate(w.date))}</h2>
+      <span class="meta">${src} · ${st.notes} note${st.notes === 1 ? "" : "s"} · ${st.span_min} min outside · ${st.spoken_s} s spoken</span>
+    </div>
+    ${restarts}
+    ${entry}
+    <details class="notes" data-walkid="${w.id}"><summary>${st.notes} voice note${st.notes === 1 ? "" : "s"}</summary>
+      <div class="note-list">${notes}</div></details>
+    <div class="row">
+      ${pending ? `<button class="btn small" data-act="transcribe" data-walk="${w.id}" ${busy || !S.whisper.ok ? "disabled" : ""}>Transcribe</button>` : ""}
+      ${hasText ? `<button class="btn small" data-act="entry" data-walk="${w.id}" ${busy || !S.gemma.ok ? "disabled" : ""}>${j ? "Rewrite entry" : "Write journal entry"}</button>` : ""}
+      ${merge}
+      ${del}
+    </div>
+  </article>`;
+}
+
+function render() {
+  if (!S) return;
+  pills(); jobBar(); weekCard(); grassBanner();
+  const r = S.recorder, busy = S.job.busy;
+  $("#import-btn").disabled = busy || !r.port || !r.access;
+  $("#folder-btn").disabled = busy;
+  $("#week-btn").disabled = busy || !S.gemma.ok || !S.walks.some(w => w.journal);
+  $("#walks").innerHTML = S.walks.length ? S.walks.map((w, i) => walkCard(w, i)).join("") :
+    `<div class="empty"><h2>No outings yet</h2></div>`;
+  // keep open note lists open across re-renders
+  openLists.forEach(id => { const d = document.querySelector(`[data-walkid="${id}"]`); if (d) d.open = true; });
+}
+const openLists = new Set();
+
+async function poll() {
+  try {
+    const r = await fetch("/api/state");
+    const txt = await r.text();
+    const editing = document.activeElement && document.activeElement.isContentEditable;
+    if (txt !== lastJSON && !editing) {
+      lastJSON = txt; S = JSON.parse(txt);
+      if (!$("#settings").open) $("#clear-cb").checked = !!S.config.clear_after_import;
+      render();
+    }
+  } catch (e) { /* the app is closing */ }
+  setTimeout(poll, 1500);
+}
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const act = b.dataset.act, walk = b.dataset.walk;
+  if (act === "play") {
+    const key = b.dataset.key;
+    if (playing === key) { audio.pause(); playing = null; }
+    else { audio.src = "/audio/" + key; audio.play(); playing = key; }
+    render();
+  } else if (act === "transcribe") await post("/api/transcribe", {walk});
+  else if (act === "entry") await post("/api/entry", {walk});
+  else if (act === "ask-delete") { confirmDelete = walk; render(); }
+  else if (act === "cancel-delete") { confirmDelete = null; render(); }
+  else if (act === "delete") { confirmDelete = null; await post("/api/delete-walk", {walk}); lastJSON = ""; }
+  else if (act === "dismiss") { await post("/api/dismiss"); }
+  else if (act === "ask-merge") { confirmMerge = walk; render(); }
+  else if (act === "cancel-merge") { confirmMerge = null; render(); }
+  else if (act === "merge") { confirmMerge = null; await post("/api/merge", {into: b.dataset.into, from: walk}); lastJSON = ""; }
+});
+
+document.addEventListener("toggle", e => {
+  const d = e.target;
+  if (d.matches && d.matches("details.notes")) {
+    const id = d.dataset.walkid;
+    if (id) d.open ? openLists.add(id) : openLists.delete(id);
+  }
+}, true);
+
+document.addEventListener("focusout", async e => {
+  const el = e.target;
+  if (el.isContentEditable && el.dataset.file) {
+    await post("/api/transcript", {walk: el.dataset.walk, file: el.dataset.file, text: el.innerText.trim()});
+    lastJSON = "";
+  }
+});
+
+$("#import-btn").onclick = () => post("/api/import", {clear: $("#clear-cb").checked});
+$("#clear-cb").onchange = () => post("/api/config", {clear_after_import: $("#clear-cb").checked});
+$("#week-btn").onclick = () => post("/api/week");
+$("#upload-btn").onclick = () => $("#file-in").click();
+$("#folder-btn").onclick = () => $("#dir-in").click();
+$("#file-in").onchange = $("#dir-in").onchange = async e => {
+  let files = [...e.target.files];
+  if (e.target.id === "dir-in") {           // a copied recorder folder: its WAVs plus index.csv
+    files = files.filter(f => /\.wav$/i.test(f.name) || f.name.toLowerCase() === "index.csv");
+    if (!files.some(f => /\.wav$/i.test(f.name))) { e.target.value = ""; return showLocalError("No WAV recordings in that folder."); }
+  }
+  if (!files.length) return;
+  const batch = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  for (const f of files) {
+    const q = new URLSearchParams({batch, name: f.name, mtime: String(f.lastModified || Date.now())});
+    await fetch("/api/upload?" + q, {method: "POST", body: f});
+  }
+  e.target.value = "";
+  await post("/api/upload-done", {batch});
+};
+function modelNote(name) {                    // from the size in the name: e2b, 14b, 135m...
+  if (/function/i.test(name)) return " · tool calls, not writing";
+  const m = name.match(/(\d+(?:\.\d+)?)([bm])\b/i);
+  if (!m) return "";
+  const b = m[2].toLowerCase() === "m" ? m[1] / 1000 : +m[1];
+  return b < 1 ? " · tiny, weakest" : b <= 2 ? " · small, fastest" : b <= 5 ? " · balanced" : " · bigger, slower, better";
+}
+$("#settings-btn").onclick = () => {
+  const g = S.gemma.models || [];
+  $("#set-gemma").innerHTML = g.length ? g.map(m => `<option value="${esc(m)}" ${m === S.gemma.model ? "selected" : ""}>${esc(m)}${modelNote(m)}</option>`).join("")
+                                       : `<option value="">Ollama isn't running</option>`;
+  $("#set-whisper").value = S.config.whisper_model;
+  $("#set-auto").checked = !!S.config.auto_process;
+  $("#set-loc").value = S.config.pincode || S.config.city || "";
+  lookupPin(S.config.city);
+  $("#settings").showModal();
+};
+let pinSeq = 0;
+async function lookupPin(keep) {
+  const v = $("#set-loc").value.trim(), sel = $("#set-area"), msg = $("#loc-msg"), seq = ++pinSeq;
+  sel.hidden = true; sel.innerHTML = ""; msg.textContent = "";
+  if (!/^\d{6}$/.test(v)) return;
+  msg.textContent = "Looking up " + v + "…";
+  const r = await fetch("/api/pincode?pin=" + v).catch(() => null);
+  const j = r ? await r.json().catch(() => ({})) : {error: "The app isn't answering."};
+  if (seq !== pinSeq) return;                 // the PIN changed while we waited
+  const areas = j.areas || [];
+  if (!areas.length) { msg.textContent = j.error || "No areas found for " + v + "."; return; }
+  sel.innerHTML = areas.map(a => {
+    const val = a.name + ", " + a.district;
+    return `<option value="${esc(val)}" ${val === keep ? "selected" : ""}>${esc(a.name)}</option>`;
+  }).join("");
+  sel.hidden = false;
+  msg.textContent = areas[0].district + ", " + areas[0].state;
+}
+function chosenLocation() {
+  const v = $("#set-loc").value.trim(), sel = $("#set-area");
+  if (/^\d{6}$/.test(v)) return sel.value ? {pincode: v, city: sel.value} : {};
+  return v ? {pincode: "", city: v} : {};
+}
+$("#set-loc").oninput = () => lookupPin();
+$("#help-btn").onclick = () => $("#help").showModal();
+$("#help-close").onclick = () => $("#help").close();
+$("#set-cancel").onclick = () => $("#settings").close();
+$("#set-save").onclick = async () => {
+  const body = {whisper_model: $("#set-whisper").value, auto_process: $("#set-auto").checked,
+                ...chosenLocation()};
+  if ($("#set-gemma").value) body.ollama_model = $("#set-gemma").value;
+  await post("/api/config", body); lastJSON = ""; $("#settings").close();
+};
+$("#quit-btn").onclick = async () => {
+  await post("/api/quit");
+  document.body.innerHTML = '<main class="wrap"><div class="empty"><h2>Field Notes has stopped</h2>You can close this window.</div></main>';
+};
+poll();
+</script>
+</body>
+</html>

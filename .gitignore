@@ -1,0 +1,14 @@
+# personal data: recordings, imported outings, journal, weather cache
+fieldnotes/data/
+back/
+clips/
+*.wav
+screenshots/
+
+# secrets
+.env
+
+# local environment
+venv/
+__pycache__/
+*.pyc
